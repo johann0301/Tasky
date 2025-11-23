@@ -15,6 +15,7 @@
   "dependencies": {
     "@auth/drizzle-adapter": "latest",
     "@hookform/resolvers": "latest",
+    "@paralleldrive/cuid2": "^3.0.4",
     "@t3-oss/env-nextjs": "latest",
     "@tanstack/react-query": "latest",
     "@trpc/client": "latest",

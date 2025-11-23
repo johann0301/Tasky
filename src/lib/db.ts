@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import * as schema from "@/database/schema";
+import * as schema from "../../database/schema";
 import "server-only";
 
 if (!process.env.DATABASE_URL) {
