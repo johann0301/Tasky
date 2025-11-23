@@ -1,0 +1,50 @@
+You are an expert Full Stack Developer specializing in the T3 Stack (Next.js 15, tRPC v11, Drizzle, NextAuth v5).
+
+# 1. STRICT Project Structure (Feature-First Architecture)
+- **Root Rules:**
+  - `src/app`: Only routing logic (page.tsx, layout.tsx, loading.tsx).
+  - `src/features/[FeatureName]`: ALL business logic, components, and state for a feature.
+  - `src/_shared`: Only truly generic UI components (shadcn) and hooks.
+  - `database`: Drizzle schemas (`schema.ts`) and migrations.
+
+# 2. Tech Stack & Versioning Rules
+- **Next.js 15 (App Router):**
+  - NEVER use `getStaticProps` or `getServerSideProps`.
+  - In `page.tsx` or `layout.tsx`, dynamic params (`params` and `searchParams`) are **PROMISES**. You MUST `await` them.
+    - Incorrect: `const { id } = props.params;`
+    - Correct: `const { id } = await props.params;`
+  - Use `server-only` for data fetching functions.
+
+- **tRPC v11:**
+  - Use `initTRPC.create()` syntax.
+  - Procedures: `publicProcedure`, `protectedProcedure`.
+  - Validation: ALWAYS use `z.object({...})` in `.input()`.
+
+- **Drizzle ORM:**
+  - Use `drizzle-orm/pg-core`.
+  - Use `db.query.tableName.findMany()` syntax for simple queries.
+  - Use `eq`, `and`, `or`, `desc` from `drizzle-orm`.
+
+- **Zustand:**
+  - Create stores within `src/features/[Feature]/store/`.
+  - Use `create<State & Actions>((set) => (...))` pattern with TypeScript.
+
+# 3. Coding Standards & Patterns
+- **Validation:** Use `zod` for EVERYTHING (Forms, API inputs, Env vars).
+- **UI Components:**
+  - Use `shadcn/ui` components located in `src/_shared/components`.
+  - Use `lucide-react` for icons.
+  - Forms: Use `react-hook-form` + `@hookform/resolvers/zod` + `shadcn/ui/form`.
+- **Styling:**
+  - Tailwind CSS. Use `clsx` and `tailwind-merge` (via `cn` helper) for conditional classes.
+  - Mobile-first responsiveness.
+
+# 4. Testing (Jest & Playwright)
+- Unit tests (Jest) go in `src/tests/unit` or alongside logic if requested.
+- E2E tests (Playwright) go in `src/tests/e2e`.
+- Mock database calls in Unit tests; use a test DB for E2E.
+
+# 5. Specific Challenge Constraints
+- **Folder Isolation:** If I ask for a "Task Manager", create/edit files inside `src/features/TaskManager`. Do not scatter files.
+- **Auth:** NextAuth v5 Beta syntax. Use `auth()` helper for server-side session.
+- **Images:** Use `next/image`.
