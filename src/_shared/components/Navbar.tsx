@@ -78,13 +78,13 @@ export function Navbar() {
           ) : (
             <div className="flex items-center gap-2">
               <Button asChild variant="ghost">
-                <Link href="/login">
+                <Link href="/auth/login">
                   <LogIn className="mr-2 h-4 w-4" />
                   Entrar
                 </Link>
               </Button>
               <Button asChild>
-                <Link href="/register">Cadastrar</Link>
+                <Link href="/auth/register">Cadastrar</Link>
               </Button>
             </div>
           )}

@@ -190,3 +190,36 @@ export async function resetPassword(
     return { error: "Erro ao resetar senha" };
   }
 }
+
+// Login via Server Action
+const loginSchema = z.object({
+  email: z.string().email("Email inválido"),
+  password: z.string().min(1, "Senha é obrigatória"),
+});
+
+export async function loginUser(credentials: {
+  email: string;
+  password: string;
+}) {
+  try {
+    const validatedData = loginSchema.parse(credentials);
+    const { signIn } = await import("@/lib/auth");
+    
+    const result = await signIn("credentials", {
+      email: validatedData.email,
+      password: validatedData.password,
+      redirect: false,
+    });
+
+    if (!result || result.error) {
+      return { error: result?.error || "Credenciais inválidas" };
+    }
+
+    return { success: true };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { error: getZodErrorMessage(error) };
+    }
+    return { error: "Erro ao fazer login" };
+  }
+}

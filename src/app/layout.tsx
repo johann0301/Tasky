@@ -3,6 +3,7 @@ import "./globals.css";
 import { TRPCProvider } from "./_trpc/Provider";
 import { SessionProvider } from "./_trpc/SessionProvider";
 import { Navbar } from "@/shared/components/Navbar";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Tasky",
@@ -21,6 +22,7 @@ export default function RootLayout({
           <TRPCProvider>
             <Navbar />
             {children}
+            <Toaster />
           </TRPCProvider>
         </SessionProvider>
       </body>
