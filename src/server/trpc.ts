@@ -1,6 +1,7 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { auth } from "@/lib/auth";
+import { taskRouter } from "./routers/taskRouter";
 import "server-only";
 
 /**
@@ -46,8 +47,7 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
  * Add your routers here as you create them
  */
 export const appRouter = router({
-  // Example: Add your routers here
-  // example: exampleRouter,
+  task: taskRouter,
 });
 
 export type AppRouter = typeof appRouter;
