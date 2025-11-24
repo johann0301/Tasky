@@ -1,0 +1,154 @@
+"use client";
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/components/card";
+import { Button } from "@/shared/components/button";
+import { TaskStatus, TaskPriority } from "../store/taskStore";
+import { 
+  Calendar, 
+  Flag, 
+  Edit2, 
+  Trash2, 
+  CheckCircle2, 
+  Circle, 
+  Clock,
+  MoreVertical 
+} from "lucide-react";
+import { format } from "date-fns";
+import { useTaskStore } from "../store/taskStore";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/components/dropdown-menu";
+
+export interface Task {
+  id: string;
+  title: string;
+  description: string | null;
+  status: TaskStatus;
+  priority: TaskPriority;
+  dueDate: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+}
+
+interface TaskCardProps {
+  task: Task;
+}
+
+const statusConfig = {
+  todo: {
+    label: "A fazer",
+    icon: Circle,
+    color: "text-muted-foreground",
+    bgColor: "bg-muted",
+  },
+  "in-progress": {
+    label: "Em progresso",
+    icon: Clock,
+    color: "text-blue-600",
+    bgColor: "bg-blue-100",
+  },
+  done: {
+    label: "Concluída",
+    icon: CheckCircle2,
+    color: "text-green-600",
+    bgColor: "bg-green-100",
+  },
+} as const;
+
+const priorityConfig = {
+  low: {
+    label: "Baixa",
+    color: "text-gray-600",
+    flagColor: "text-gray-500",
+  },
+  medium: {
+    label: "Média",
+    color: "text-yellow-600",
+    flagColor: "text-yellow-500",
+  },
+  high: {
+    label: "Alta",
+    color: "text-red-600",
+    flagColor: "text-red-500",
+  },
+} as const;
+
+export function TaskCard({ task }: TaskCardProps) {
+  const openEditModal = useTaskStore((state) => state.openEditModal);
+  const openDeleteModal = useTaskStore((state) => state.openDeleteModal);
+  
+  const StatusIcon = statusConfig[task.status].icon;
+  const statusInfo = statusConfig[task.status];
+  const priorityInfo = priorityConfig[task.priority];
+
+  const isOverdue = task.dueDate && task.status !== "done" && new Date(task.dueDate) < new Date();
+
+  return (
+    <Card className="hover:shadow-md transition-shadow">
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <CardTitle className="text-lg font-semibold line-clamp-2">
+              {task.title}
+            </CardTitle>
+            {task.description && (
+              <CardDescription className="mt-1 line-clamp-2">
+                {task.description}
+              </CardDescription>
+            )}
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => openEditModal(task.id)}>
+                <Edit2 className="mr-2 h-4 w-4" />
+                Editar
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => openDeleteModal(task.id)}
+                className="text-red-600 focus:text-red-600"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Excluir
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <div className="flex flex-wrap items-center gap-3 text-sm">
+          {/* Status */}
+          <div className="flex items-center gap-1.5">
+            <StatusIcon className={`h-4 w-4 ${statusInfo.color}`} />
+            <span className={statusInfo.color}>{statusInfo.label}</span>
+          </div>
+
+          {/* Priority */}
+          <div className="flex items-center gap-1.5">
+            <Flag className={`h-4 w-4 ${priorityInfo.flagColor}`} />
+            <span className={priorityInfo.color}>{priorityInfo.label}</span>
+          </div>
+
+          {/* Due Date */}
+          {task.dueDate && (
+            <div className={`flex items-center gap-1.5 ${isOverdue ? "text-red-600" : "text-muted-foreground"}`}>
+              <Calendar className="h-4 w-4" />
+              <span>
+                {format(new Date(task.dueDate), "dd MMM yyyy")}
+                {isOverdue && " (Atrasada)"}
+              </span>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

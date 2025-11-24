@@ -1,7 +1,6 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { auth } from "@/lib/auth";
-import { taskRouter } from "./routers/taskRouter";
 import "server-only";
 
 /**
@@ -43,11 +42,6 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
 });
 
 /**
- * Main app router
- * Add your routers here as you create them
+ * This file only exports the base router and procedures
+ * The main appRouter is in ./router.ts to avoid circular dependencies
  */
-export const appRouter = router({
-  task: taskRouter,
-});
-
-export type AppRouter = typeof appRouter;
