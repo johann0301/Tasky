@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { TRPCProvider } from "./_trpc/Provider";
+import { SessionProvider } from "./_trpc/SessionProvider";
+import { Navbar } from "@/shared/components/Navbar";
 
 export const metadata: Metadata = {
-  title: "Desafio Ale",
-  description: "Aplicação T3 Stack",
+  title: "Tasky",
+  description: "Gerencie suas tarefas com facilidade",
 };
 
 export default function RootLayout({
@@ -15,7 +17,12 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body>
-        <TRPCProvider>{children}</TRPCProvider>
+        <SessionProvider>
+          <TRPCProvider>
+            <Navbar />
+            {children}
+          </TRPCProvider>
+        </SessionProvider>
       </body>
     </html>
   );
