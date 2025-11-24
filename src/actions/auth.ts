@@ -1,12 +1,13 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { users } from "../../database/schema";
+import { users, verificationTokens } from "../../database/schema";
 import { eq, and, gt } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { createId } from "@paralleldrive/cuid2";
 import { Resend } from "resend";
+import { getZodErrorMessage } from "@/shared/util/error-handler";
 import "server-only";
 
 const resend = process.env.RESEND_API_KEY
@@ -60,7 +61,7 @@ export async function registerUser(data: z.infer<typeof registerSchema>) {
     return { success: true, user: { id: newUser.id, email: newUser.email } };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { error: error.errors[0]?.message ?? "Dados inválidos" };
+      return { error: getZodErrorMessage(error) };
     }
     return { error: "Erro ao registrar usuário" };
   }
@@ -91,7 +92,6 @@ export async function requestPasswordReset(
     expiresAt.setHours(expiresAt.getHours() + 1); // Expira em 1 hora
 
     // Salvar token no banco (usando verificationTokens do NextAuth)
-    const { verificationTokens } = await import("@/database/schema");
     await db.insert(verificationTokens).values({
       identifier: email,
       token: resetToken,
@@ -115,18 +115,20 @@ export async function requestPasswordReset(
         `,
       });
     } else {
-      // Simular envio (apenas log no desenvolvimento)
-      console.log("=".repeat(50));
-      console.log("EMAIL DE RECUPERAÇÃO DE SENHA (SIMULADO):");
-      console.log("Para:", email);
-      console.log("Link:", resetUrl);
-      console.log("=".repeat(50));
+      // Simular envio (apenas em desenvolvimento)
+      if (process.env.NODE_ENV === "development") {
+        console.log("=".repeat(50));
+        console.log("EMAIL DE RECUPERAÇÃO DE SENHA (SIMULADO):");
+        console.log("Para:", email);
+        console.log("Link:", resetUrl);
+        console.log("=".repeat(50));
+      }
     }
 
     return { success: true };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { error: error.errors[0]?.message ?? "Dados inválidos" };
+      return { error: getZodErrorMessage(error) };
     }
     return { error: "Erro ao solicitar recuperação de senha" };
   }
@@ -140,8 +142,6 @@ export async function resetPassword(
     const { token, password } = resetPasswordSchema.parse(data);
 
     // Buscar token válido
-    const { verificationTokens } = await import("@/database/schema");
-
     const [tokenRecord] = await db
       .select()
       .from(verificationTokens)
@@ -185,7 +185,7 @@ export async function resetPassword(
     return { success: true };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { error: error.errors[0]?.message ?? "Dados inválidos" };
+      return { error: getZodErrorMessage(error) };
     }
     return { error: "Erro ao resetar senha" };
   }

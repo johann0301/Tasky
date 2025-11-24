@@ -6,6 +6,7 @@ import { users } from "@/database/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { getZodErrorMessage } from "@/shared/util/error-handler";
 import "server-only";
 
 const loginSchema = z.object({
@@ -59,8 +60,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           };
         } catch (error) {
           if (error instanceof z.ZodError) {
-            const firstError = error.issues[0];
-            throw new Error(firstError?.message ?? "Dados inválidos");
+            throw new Error(getZodErrorMessage(error));
           }
           throw error;
         }
