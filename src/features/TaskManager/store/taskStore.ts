@@ -5,6 +5,7 @@ export type TaskStatus = "todo" | "in-progress" | "done";
 export type TaskPriority = "low" | "medium" | "high";
 export type SortField = "createdAt" | "updatedAt" | "dueDate" | "title" | "priority" | "status";
 export type SortDirection = "asc" | "desc";
+export type ViewMode = "list" | "kanban";
 
 export interface TaskFilters {
   status?: TaskStatus;
@@ -13,6 +14,9 @@ export interface TaskFilters {
 }
 
 interface TaskState {
+  // Modo de visualização
+  viewMode: ViewMode;
+  
   // Filtros
   filters: TaskFilters;
   
@@ -28,6 +32,9 @@ interface TaskState {
 }
 
 interface TaskActions {
+  // Modo de visualização
+  setViewMode: (mode: ViewMode) => void;
+  
   // Filtros
   setFilter: (filter: Partial<TaskFilters>) => void;
   clearFilters: () => void;
@@ -49,6 +56,7 @@ interface TaskActions {
 type TaskStore = TaskState & TaskActions;
 
 const initialState: TaskState = {
+  viewMode: "list",
   filters: {},
   sortField: "createdAt",
   sortDirection: "desc",
@@ -60,6 +68,12 @@ const initialState: TaskState = {
 
 export const useTaskStore = create<TaskStore>((set) => ({
   ...initialState,
+
+  // Modo de visualização
+  setViewMode: (mode) =>
+    set({
+      viewMode: mode,
+    }),
 
   // Filtros
   setFilter: (filter) =>
