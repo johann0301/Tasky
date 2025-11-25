@@ -11,7 +11,7 @@ import {
 } from "./dropdown-menu";
 import { Button } from "./button";
 import { useSession, signOut } from "next-auth/react";
-import { LogOut, User, LogIn, Home, ListTodo, LayoutGrid, Plus } from "lucide-react";
+import { LogOut, User, LogIn, ListTodo, Plus } from "lucide-react";
 import Link from "next/link";
 import { useTaskStore } from "@/features/TaskManager/store/taskStore";
 import { usePathname } from "next/navigation";
@@ -36,7 +36,10 @@ export function Navbar() {
   return (
     <nav className="border-b bg-background">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+        <Link
+          href={session?.user ? "/tasks" : "/"}
+          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+        >
           <h1 className="text-xl font-bold">Tasky</h1>
         </Link>
 
@@ -47,16 +50,6 @@ export function Navbar() {
             <>
               {/* Links de Navegação */}
               <div className="hidden md:flex items-center gap-1">
-                <Button
-                  asChild
-                  variant={isActive("/") ? "secondary" : "ghost"}
-                  size="sm"
-                >
-                  <Link href="/">
-                    <Home className="mr-2 h-4 w-4" />
-                    Início
-                  </Link>
-                </Button>
                 <Button
                   asChild
                   variant={isActive("/tasks") ? "secondary" : "ghost"}
@@ -111,12 +104,6 @@ export function Navbar() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/" className="flex items-center w-full">
-                      <Home className="mr-2 h-4 w-4" />
-                      Início
-                    </Link>
-                  </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/tasks" className="flex items-center w-full">
                       <ListTodo className="mr-2 h-4 w-4" />
