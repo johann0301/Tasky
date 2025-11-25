@@ -63,8 +63,8 @@ export function TaskKanbanCard({ task }: TaskKanbanCardProps) {
   const isOverdue = task.dueDate && task.status !== "done" && new Date(task.dueDate) < new Date();
 
   return (
-    <Card className="hover:shadow-md transition-shadow mb-3">
-      <CardHeader className="pb-3">
+    <Card className="bg-card border shadow-sm hover:shadow-md transition-all mb-3">
+      <CardHeader className="pb-4">
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <Link href={`/tasks/${task.id}`}>
@@ -73,7 +73,7 @@ export function TaskKanbanCard({ task }: TaskKanbanCardProps) {
               </CardTitle>
             </Link>
             {task.description && (
-              <CardDescription className="mt-1 line-clamp-2 text-xs">
+              <CardDescription className="mt-2 text-muted-foreground line-clamp-2 text-xs">
                 {task.description}
               </CardDescription>
             )}

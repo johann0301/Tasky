@@ -89,8 +89,8 @@ export function TaskCard({ task }: TaskCardProps) {
   const isOverdue = task.dueDate && task.status !== "done" && new Date(task.dueDate) < new Date();
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader className="pb-3">
+    <Card className="bg-card border shadow-sm hover:shadow-md transition-all">
+      <CardHeader className="pb-4">
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <Link href={`/tasks/${task.id}`}>
@@ -99,7 +99,7 @@ export function TaskCard({ task }: TaskCardProps) {
               </CardTitle>
             </Link>
             {task.description && (
-              <CardDescription className="mt-1 line-clamp-2">
+              <CardDescription className="mt-2 text-muted-foreground line-clamp-2">
                 {task.description}
               </CardDescription>
             )}
@@ -126,7 +126,7 @@ export function TaskCard({ task }: TaskCardProps) {
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent className="pt-0">
+      <CardContent className="pt-0 space-y-2">
         <div className="flex flex-wrap items-center gap-3 text-sm">
           {/* Status */}
           <div className="flex items-center gap-1.5">

@@ -203,10 +203,10 @@ function KanbanColumn({
       </div>
       <div
         ref={setNodeRef}
-        className={`flex-1 min-h-[200px] rounded-lg border-2 border-dashed p-4 transition-colors ${
+        className={`flex-1 min-h-[200px] rounded-lg border-2 border-dashed p-4 transition-colors flex flex-col ${
           isOver
             ? "border-primary bg-primary/5"
-            : "border-muted bg-muted/20"
+            : "border-muted bg-muted/50"
         }`}
       >
         {tasks.length === 0 ? (
@@ -214,7 +214,11 @@ function KanbanColumn({
             Nenhuma tarefa
           </p>
         ) : (
-          tasks.map((task) => <DraggableTaskCard key={task.id} task={task} />)
+          <div className="flex flex-col gap-4">
+            {tasks.map((task) => (
+              <DraggableTaskCard key={task.id} task={task} />
+            ))}
+          </div>
         )}
       </div>
     </div>

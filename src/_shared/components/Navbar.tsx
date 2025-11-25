@@ -38,7 +38,7 @@ export function Navbar() {
   const isUnauthenticated = !isLoading && !session?.user;
 
   return (
-    <nav className="border-b bg-background">
+    <nav className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-md shadow-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link
           href={isAuthenticated ? "/tasks" : "/"}

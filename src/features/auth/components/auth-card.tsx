@@ -19,7 +19,7 @@ export function AuthCard({
   children,
 }: AuthCardProps) {
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md bg-card border shadow-lg">
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         {description && <CardDescription>{description}</CardDescription>}

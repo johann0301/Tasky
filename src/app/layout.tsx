@@ -21,7 +21,9 @@ export default function RootLayout({
         <SessionProvider>
           <TRPCProvider>
             <ConditionalNavbar />
-            {children}
+            <main className="min-h-screen">
+              {children}
+            </main>
             <Toaster />
           </TRPCProvider>
         </SessionProvider>

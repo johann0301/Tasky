@@ -39,7 +39,7 @@ export function TaskFilters() {
   );
 
   return (
-    <div className="mb-6 space-y-4 rounded-lg border bg-card p-4">
+    <div className="mb-6 space-y-4 rounded-lg border bg-card shadow-sm p-4">
       <div className="flex flex-col gap-4 md:flex-row md:items-end">
         {/* Busca */}
         <div className="flex-1">
