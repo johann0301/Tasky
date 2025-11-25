@@ -11,7 +11,7 @@ import {
 } from "./dropdown-menu";
 import { Button } from "./button";
 import { useSession, signOut } from "next-auth/react";
-import { LogOut, User, LogIn, ListTodo, Plus } from "lucide-react";
+import { LogOut, User, ListTodo, Plus } from "lucide-react";
 import Link from "next/link";
 import { useTaskStore } from "@/features/TaskManager/store/taskStore";
 import { usePathname } from "next/navigation";
@@ -32,12 +32,16 @@ export function Navbar() {
     : session?.user?.email?.[0]?.toUpperCase() ?? "U";
 
   const isActive = (path: string) => pathname === path;
+  
+  // Garantir que só mostramos login/cadastro se realmente não houver sessão
+  const isAuthenticated = !isLoading && session?.user;
+  const isUnauthenticated = !isLoading && !session?.user;
 
   return (
     <nav className="border-b bg-background">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link
-          href={session?.user ? "/tasks" : "/"}
+          href={isAuthenticated ? "/tasks" : "/"}
           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
           <h1 className="text-xl font-bold">Tasky</h1>
@@ -46,7 +50,7 @@ export function Navbar() {
         <div className="flex items-center gap-4">
           {isLoading ? (
             <div className="h-10 w-20 animate-pulse rounded bg-muted" />
-          ) : session?.user ? (
+          ) : isAuthenticated ? (
             <>
               {/* Links de Navegação */}
               <div className="hidden md:flex items-center gap-1">
@@ -119,7 +123,15 @@ export function Navbar() {
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    onClick={() => signOut({ callbackUrl: "/" })}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      // Redirecionar imediatamente para landing page
+                      window.location.href = "/";
+                      // Fazer signOut em background (não esperar)
+                      signOut({ redirect: false }).catch(() => {
+                        // Ignorar erros - já redirecionamos
+                      });
+                    }}
                     className="text-red-600 focus:text-red-600 cursor-pointer"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
@@ -128,19 +140,7 @@ export function Navbar() {
                 </DropdownMenuContent>
               </DropdownMenu>
             </>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Button asChild variant="ghost">
-                <Link href="/auth/login">
-                  <LogIn className="mr-2 h-4 w-4" />
-                  Entrar
-                </Link>
-              </Button>
-              <Button asChild>
-                <Link href="/auth/register">Cadastrar</Link>
-              </Button>
-            </div>
-          )}
+          ) : null}
         </div>
       </div>
     </nav>

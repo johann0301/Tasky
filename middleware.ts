@@ -25,7 +25,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Páginas públicas que podem ser acessadas por qualquer um (autenticado ou não)
-  const publicRoutes = ["/stats"];
+  const publicRoutes = ["/stats", "/faq", "/help"];
   const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route));
 
   // Se for rota pública, permitir acesso (com ou sem sessão)

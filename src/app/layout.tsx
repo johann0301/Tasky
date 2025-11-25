@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { TRPCProvider } from "./_trpc/Provider";
 import { SessionProvider } from "./_trpc/SessionProvider";
-import { Navbar } from "@/shared/components/Navbar";
+import { ConditionalNavbar } from "@/shared/components/ConditionalNavbar";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
@@ -20,7 +20,7 @@ export default function RootLayout({
       <body>
         <SessionProvider>
           <TRPCProvider>
-            <Navbar />
+            <ConditionalNavbar />
             {children}
             <Toaster />
           </TRPCProvider>

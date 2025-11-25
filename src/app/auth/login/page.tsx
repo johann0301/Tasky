@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 import { AuthCard } from "@/features/auth/components/auth-card";
 import {
   Form,
@@ -30,6 +31,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { update: updateSession } = useSession();
   const [isLoading, setIsLoading] = useState(false);
 
   const callbackUrl = searchParams.get("callbackUrl") || "/tasks";
@@ -53,9 +55,13 @@ export default function LoginPage() {
       }
 
       if (result.success) {
+        // Atualizar sessão imediatamente
+        await updateSession();
+        
         toast.success("Login realizado com sucesso!");
-        router.push(callbackUrl);
-        router.refresh();
+        
+        // Forçar reload completo da página para garantir que tudo seja atualizado
+        window.location.href = callbackUrl;
       }
     } catch (error) {
       toast.error("Erro ao fazer login. Tente novamente.");

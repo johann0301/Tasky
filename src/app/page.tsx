@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/shared/components/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/components/card";
+import { Footer } from "@/shared/components/Footer";
 import {
   CheckCircle2,
   LayoutGrid,
@@ -46,6 +47,13 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col">
+      {/* Header simples sem link */}
+      <header className="border-b bg-background">
+        <div className="container mx-auto flex h-16 items-center justify-center px-4">
+          <h1 className="text-xl font-bold">Tasky</h1>
+        </div>
+      </header>
+
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20 text-center">
         <div className="mx-auto max-w-3xl">
@@ -186,6 +194,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <Footer />
     </main>
   );
 }
