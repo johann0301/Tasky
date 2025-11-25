@@ -6,8 +6,6 @@ import { TaskStatus, TaskPriority } from "../store/taskStore";
 import { 
   Calendar, 
   Flag, 
-  ChevronLeft,
-  ChevronRight,
   MoreVertical,
   Edit2,
   Trash2
@@ -21,8 +19,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/shared/components/dropdown-menu";
-import { trpc } from "@/lib/trpc";
-import { toast } from "sonner";
 
 export interface Task {
   id: string;
@@ -61,43 +57,10 @@ const priorityConfig = {
 export function TaskKanbanCard({ task }: TaskKanbanCardProps) {
   const openEditModal = useTaskStore((state) => state.openEditModal);
   const openDeleteModal = useTaskStore((state) => state.openDeleteModal);
-  const utils = trpc.useUtils();
 
   const priorityInfo = priorityConfig[task.priority];
 
   const isOverdue = task.dueDate && task.status !== "done" && new Date(task.dueDate) < new Date();
-
-  const updateMutation = trpc.task.update.useMutation({
-    onSuccess: () => {
-      utils.task.getAll.invalidate();
-      toast.success("Status atualizado com sucesso!");
-    },
-    onError: (error) => {
-      toast.error(error.message || "Erro ao atualizar status");
-    },
-  });
-
-  const getNextStatus = (currentStatus: TaskStatus): TaskStatus | null => {
-    if (currentStatus === "todo") return "in-progress";
-    if (currentStatus === "in-progress") return "done";
-    return null;
-  };
-
-  const getPrevStatus = (currentStatus: TaskStatus): TaskStatus | null => {
-    if (currentStatus === "done") return "in-progress";
-    if (currentStatus === "in-progress") return "todo";
-    return null;
-  };
-
-  const handleMoveStatus = (newStatus: TaskStatus) => {
-    updateMutation.mutate({
-      id: task.id,
-      status: newStatus,
-    });
-  };
-
-  const nextStatus = getNextStatus(task.status);
-  const prevStatus = getPrevStatus(task.status);
 
   return (
     <Card className="hover:shadow-md transition-shadow mb-3">
@@ -155,33 +118,6 @@ export function TaskKanbanCard({ task }: TaskKanbanCardProps) {
           </div>
         )}
 
-        {/* Botões de mover */}
-        <div className="flex gap-1 pt-2 border-t">
-          {prevStatus && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1 text-xs h-7"
-              onClick={() => handleMoveStatus(prevStatus)}
-              disabled={updateMutation.isPending}
-            >
-              <ChevronLeft className="h-3 w-3 mr-1" />
-              {prevStatus === "todo" ? "A fazer" : "Em progresso"}
-            </Button>
-          )}
-          {nextStatus && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1 text-xs h-7"
-              onClick={() => handleMoveStatus(nextStatus)}
-              disabled={updateMutation.isPending}
-            >
-              {nextStatus === "done" ? "Concluída" : "Em progresso"}
-              <ChevronRight className="h-3 w-3 ml-1" />
-            </Button>
-          )}
-        </div>
       </CardContent>
     </Card>
   );

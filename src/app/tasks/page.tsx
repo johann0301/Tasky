@@ -2,6 +2,7 @@
 
 import { TaskList } from "@/features/TaskManager/components/TaskList";
 import { TaskKanban } from "@/features/TaskManager/components/TaskKanban";
+import { TaskFilters } from "@/features/TaskManager/components/TaskFilters";
 import { TaskFormDialog } from "@/features/TaskManager/components/TaskFormDialog";
 import { Button } from "@/shared/components/button";
 import { Plus, LayoutGrid, List } from "lucide-react";
@@ -48,6 +49,7 @@ export default function TasksPage() {
           </Button>
         </div>
       </div>
+      <TaskFilters />
       {viewMode === "list" ? <TaskList /> : <TaskKanban />}
       <TaskFormDialog />
     </div>
