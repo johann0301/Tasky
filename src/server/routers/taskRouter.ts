@@ -68,6 +68,27 @@ export const taskRouter = router({
       return userTasks;
     }),
 
+  getById: protectedProcedure
+    .input(z.object({ id: z.string().min(1) }))
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      const [task] = await db
+        .select()
+        .from(tasks)
+        .where(and(eq(tasks.id, input.id), eq(tasks.userId, userId)))
+        .limit(1);
+
+      if (!task) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Tarefa não encontrada",
+        });
+      }
+
+      return task;
+    }),
+
   create: protectedProcedure
     .input(createTaskSchema)
     .mutation(async ({ ctx, input }) => {

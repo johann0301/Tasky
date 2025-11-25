@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { useTaskStore } from "../store/taskStore";
+import Link from "next/link";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -92,9 +93,11 @@ export function TaskCard({ task }: TaskCardProps) {
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <CardTitle className="text-lg font-semibold line-clamp-2">
-              {task.title}
-            </CardTitle>
+            <Link href={`/tasks/${task.id}`}>
+              <CardTitle className="text-lg font-semibold line-clamp-2 hover:underline cursor-pointer">
+                {task.title}
+              </CardTitle>
+            </Link>
             {task.description && (
               <CardDescription className="mt-1 line-clamp-2">
                 {task.description}
