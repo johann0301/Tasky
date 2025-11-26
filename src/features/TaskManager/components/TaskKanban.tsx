@@ -1,10 +1,10 @@
 "use client";
 
 import { trpc } from "@/lib/trpc";
-import { TaskKanbanCard, type Task } from "./TaskKanbanCard";
+import { TaskKanbanCard } from "./TaskKanbanCard";
 import { useTaskStore } from "../store/taskStore";
 import { Loader2 } from "lucide-react";
-import { TaskStatus } from "../store/taskStore";
+import { TaskStatus, type Task } from "../types";
 import {
   DndContext,
   DragEndEvent,
@@ -30,26 +30,26 @@ export function TaskKanban() {
   const filters = useTaskStore((state) => state.filters);
   const utils = trpc.useUtils();
 
-  // Remover filtro de status para mostrar todas as tarefas nas colunas
+  // Remove filter, show all tasks in columns
   const { status: statusFilter, ...otherFilters } = filters;
 
   const { data: tasks, isLoading, error } = trpc.task.getAll.useQuery(otherFilters);
 
-  // Estado para o drag
+  // drag
   const [activeId, setActiveId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
   const activeTask = activeId ? tasks?.find((t) => t.id === activeId) : null;
 
-  // Sensores para drag (pointer para mouse e touch)
+  // drag sensors
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8, // Precisa mover 8px antes de iniciar drag
+        distance: 8, 
       },
     })
   );
 
-  // Mutation para atualizar status
+  // Mutation to update status
   const updateMutation = trpc.task.update.useMutation({
     onSuccess: () => {
       utils.task.getAll.invalidate();
@@ -57,7 +57,6 @@ export function TaskKanban() {
     },
     onError: (error) => {
       toast.error(error.message || "Erro ao mover tarefa");
-      // Revalidar para reverter visual
       utils.task.getAll.invalidate();
     },
   });
@@ -80,18 +79,15 @@ export function TaskKanban() {
     const taskId = active.id as string;
     const newStatus = over.id as TaskStatus;
 
-    // Buscar a tarefa atual
     const task = tasks?.find((t) => t.id === taskId);
     if (!task) return;
 
-    // Se o status não mudou, não fazer nada
     if (task.status === newStatus) return;
 
-    // Validar se o novo status é válido
     const validStatuses: TaskStatus[] = ["todo", "in-progress", "done"];
     if (!validStatuses.includes(newStatus)) return;
 
-    // Atualizar status otimisticamente e na API
+    // Update status optimistically and in the API
     updateMutation.mutate({
       id: taskId,
       status: newStatus,
@@ -132,7 +128,7 @@ export function TaskKanban() {
     );
   }
 
-  // Agrupar tarefas por status
+  // Group by status
   const tasksByStatus = tasks.reduce(
     (acc, task) => {
       const status = task.status as TaskStatus;
@@ -177,7 +173,7 @@ export function TaskKanban() {
   );
 }
 
-// Componente de coluna droppable
+// Droppable column component
 function KanbanColumn({
   status,
   title,
@@ -225,7 +221,7 @@ function KanbanColumn({
   );
 }
 
-// Componente de card draggable
+  // Draggable card component
 function DraggableTaskCard({ task }: { task: Task }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: task.id,

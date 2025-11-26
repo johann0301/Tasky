@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: tasky-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tasky"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Pass environment variables needed during build
+        # These will be injected from your .env file into the build process
+        DATABASE_URL: ${DATABASE_URL}
+        UPSTASH_REDIS_REST_URL: ${UPSTASH_REDIS_REST_URL:-}
+        UPSTASH_REDIS_REST_TOKEN: ${UPSTASH_REDIS_REST_TOKEN:-}
+    container_name: tasky-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # O segredo: trocamos '@localhost' por '@postgres' (nome do container do banco)
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
+      # Passamos as outras chaves também para garantir
+      - AUTH_SECRET=${AUTH_SECRET}
+      - UPSTASH_REDIS_REST_URL=${UPSTASH_REDIS_REST_URL}
+      - UPSTASH_REDIS_REST_TOKEN=${UPSTASH_REDIS_REST_TOKEN}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+    
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+

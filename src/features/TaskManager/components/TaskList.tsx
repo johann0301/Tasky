@@ -1,7 +1,8 @@
 "use client";
 
 import { trpc } from "@/lib/trpc";
-import { TaskCard, type Task } from "./TaskCard";
+import { TaskCard } from "./TaskCard";
+import type { Task } from "../types";
 import { useTaskStore } from "../store/taskStore";
 import { Loader2 } from "lucide-react";
 

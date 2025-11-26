@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/components/card";
 import { Button } from "@/shared/components/button";
-import { TaskStatus, TaskPriority } from "../store/taskStore";
+import { TaskStatus, TaskPriority, type Task } from "../types";
 import { 
   Calendar, 
   Flag, 
@@ -22,18 +22,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/shared/components/dropdown-menu";
-
-export interface Task {
-  id: string;
-  title: string;
-  description: string | null;
-  status: TaskStatus;
-  priority: TaskPriority;
-  dueDate: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
-  userId: string;
-}
 
 interface TaskCardProps {
   task: Task;

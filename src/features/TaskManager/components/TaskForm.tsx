@@ -6,7 +6,7 @@ import { z } from "zod";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { useTaskStore } from "../store/taskStore";
-import type { Task } from "../store/taskStore";
+import type { Task } from "../types";
 import {
   Form,
   FormControl,
@@ -34,8 +34,8 @@ const taskPriorityEnum = z.enum(["low", "medium", "high"]);
 const taskFormSchema = z.object({
   title: z.string().min(1, "Título é obrigatório").max(255, "Título muito longo"),
   description: z.string().optional(),
-  status: taskStatusEnum.default("todo"),
-  priority: taskPriorityEnum.default("medium"),
+  status: taskStatusEnum,
+  priority: taskPriorityEnum,
   dueDate: z.string().optional(),
 });
 
@@ -89,7 +89,7 @@ export function TaskForm({ task, onSuccess }: TaskFormProps) {
     },
   });
 
-  // Atualizar form quando task mudar (modo edição)
+  // (editing mode)
   useEffect(() => {
     if (task) {
       form.reset({
@@ -104,7 +104,7 @@ export function TaskForm({ task, onSuccess }: TaskFormProps) {
 
   async function onSubmit(data: TaskFormValues) {
     if (isEditing && task) {
-      // Edição
+      // Editing
       updateMutation.mutate({
         id: task.id,
         title: data.title,
@@ -114,7 +114,7 @@ export function TaskForm({ task, onSuccess }: TaskFormProps) {
         dueDate: data.dueDate ? new Date(data.dueDate) : null,
       });
     } else {
-      // Criação
+      // Creation
       createMutation.mutate({
         title: data.title,
         description: data.description || undefined,

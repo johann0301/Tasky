@@ -3,18 +3,10 @@ import superjson from "superjson";
 import { auth } from "@/lib/auth";
 import "server-only";
 
-/**
- * Initialization of tRPC backend
- * Should be done only once per backend!
- */
 const t = initTRPC.create({
   transformer: superjson,
 });
 
-/**
- * Export reusable router and procedure helpers
- * that can be used throughout the router
- */
 export const router = t.router;
 export const publicProcedure = t.procedure;
 
@@ -35,13 +27,9 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
 
   return next({
     ctx: {
-      // infers the `session` as non-nullable
+      // session non nullable
       session: { ...session, user: session.user },
     },
   });
 });
 
-/**
- * This file only exports the base router and procedures
- * The main appRouter is in ./router.ts to avoid circular dependencies
- */

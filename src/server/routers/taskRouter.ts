@@ -94,7 +94,7 @@ export const taskRouter = router({
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
 
-      // Rate limiting: 5 tasks por minuto
+      // Rate limiting: 5 tasks/minute
       const { success, limit, remaining } = await taskCreationRatelimit.limit(userId);
 
       if (!success) {
@@ -125,7 +125,7 @@ export const taskRouter = router({
       const userId = ctx.session.user.id;
       const { id, ...updateData } = input;
 
-      // Verificar se a tarefa pertence ao usuário
+      // Check task belongs to user
       const [existingTask] = await db
         .select()
         .from(tasks)
@@ -156,7 +156,6 @@ export const taskRouter = router({
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
 
-      // Verificar se a tarefa pertence ao usuário
       const [existingTask] = await db
         .select()
         .from(tasks)

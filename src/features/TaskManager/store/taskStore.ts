@@ -1,8 +1,10 @@
 import { create } from "zustand";
+import type { TaskStatus, TaskPriority } from "../types";
 
-// Types
-export type TaskStatus = "todo" | "in-progress" | "done";
-export type TaskPriority = "low" | "medium" | "high";
+// Re-export types from types.ts to maintain compatibility
+export type { TaskStatus, TaskPriority } from "../types";
+
+// Specific types for the store
 export type SortField = "createdAt" | "updatedAt" | "dueDate" | "title" | "priority" | "status";
 export type SortDirection = "asc" | "desc";
 export type ViewMode = "list" | "kanban";
@@ -14,17 +16,13 @@ export interface TaskFilters {
 }
 
 interface TaskState {
-  // Modo de visualização
   viewMode: ViewMode;
   
-  // Filtros
   filters: TaskFilters;
   
-  // Ordenação
   sortField: SortField;
   sortDirection: SortDirection;
-  
-  // Visibilidade de modais
+
   isCreateModalOpen: boolean;
   isEditModalOpen: boolean;
   isDeleteModalOpen: boolean;
@@ -32,18 +30,15 @@ interface TaskState {
 }
 
 interface TaskActions {
-  // Modo de visualização
+
   setViewMode: (mode: ViewMode) => void;
   
-  // Filtros
   setFilter: (filter: Partial<TaskFilters>) => void;
   clearFilters: () => void;
   
-  // Ordenação
   setSort: (field: SortField, direction?: SortDirection) => void;
   toggleSortDirection: () => void;
   
-  // Modais
   openCreateModal: () => void;
   closeCreateModal: () => void;
   openEditModal: (taskId: string) => void;
@@ -69,13 +64,11 @@ const initialState: TaskState = {
 export const useTaskStore = create<TaskStore>((set) => ({
   ...initialState,
 
-  // Modo de visualização
   setViewMode: (mode) =>
     set({
       viewMode: mode,
     }),
 
-  // Filtros
   setFilter: (filter) =>
     set((state) => ({
       filters: {
@@ -89,7 +82,6 @@ export const useTaskStore = create<TaskStore>((set) => ({
       filters: {},
     }),
 
-  // Ordenação
   setSort: (field, direction) =>
     set({
       sortField: field,
@@ -101,7 +93,6 @@ export const useTaskStore = create<TaskStore>((set) => ({
       sortDirection: state.sortDirection === "asc" ? "desc" : "asc",
     })),
 
-  // Modais
   openCreateModal: () =>
     set({
       isCreateModalOpen: true,
