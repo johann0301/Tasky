@@ -99,7 +99,7 @@ export function TaskKanbanCard({ task }: TaskKanbanCardProps) {
         {task.dueDate && (
           <div className={`flex items-center gap-1.5 text-xs ${isOverdue ? "text-red-600" : "text-muted-foreground"}`}>
             <Calendar className="h-3 w-3" />
-            <span>
+              <span>
               {format(new Date(task.dueDate), "dd MMM")}
               {isOverdue && " ⚠"}
             </span>

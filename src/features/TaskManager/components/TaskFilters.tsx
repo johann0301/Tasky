@@ -18,10 +18,8 @@ export function TaskFilters() {
   const setFilter = useTaskStore((state) => state.setFilter);
   const clearFilters = useTaskStore((state) => state.clearFilters);
 
-  // Estado local para busca (debounce)
   const [searchValue, setSearchValue] = useState(filters.search || "");
 
-  // Debounce da busca
   useEffect(() => {
     const timer = setTimeout(() => {
       if (searchValue !== filters.search) {
@@ -41,7 +39,7 @@ export function TaskFilters() {
   return (
     <div className="mb-6 space-y-4 rounded-lg border bg-card shadow-sm p-4">
       <div className="flex flex-col gap-4 md:flex-row md:items-end">
-        {/* Busca */}
+        {/* Search */}
         <div className="flex-1">
           <label className="mb-2 block text-sm font-medium">Buscar</label>
           <div className="relative">
@@ -75,7 +73,7 @@ export function TaskFilters() {
           </Select>
         </div>
 
-        {/* Prioridade */}
+        {/* Priority */}
         <div className="w-full md:w-[180px]">
           <label className="mb-2 block text-sm font-medium">Prioridade</label>
           <Select
@@ -95,7 +93,7 @@ export function TaskFilters() {
           </Select>
         </div>
 
-        {/* Botão Limpar */}
+        {/* Clear Button */}
         {hasActiveFilters && (
           <Button
             variant="outline"

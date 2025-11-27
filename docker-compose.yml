@@ -34,9 +34,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      # O segredo: trocamos '@localhost' por '@postgres' (nome do container do banco)
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
-      # Passamos as outras chaves também para garantir
       - AUTH_SECRET=${AUTH_SECRET}
       - UPSTASH_REDIS_REST_URL=${UPSTASH_REDIS_REST_URL}
       - UPSTASH_REDIS_REST_TOKEN=${UPSTASH_REDIS_REST_TOKEN}

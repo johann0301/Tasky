@@ -19,7 +19,6 @@ export function TaskFormDialog() {
   const closeCreateModal = useTaskStore((state) => state.closeCreateModal);
   const closeEditModal = useTaskStore((state) => state.closeEditModal);
 
-  // Buscar task quando estiver editando
   const { data: task, isLoading } = trpc.task.getById.useQuery(
     { id: editingTaskId! },
     {

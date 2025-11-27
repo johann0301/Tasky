@@ -27,6 +27,7 @@ import {
 } from "@/shared/components/select";
 import { useEffect } from "react";
 import { format } from "date-fns";
+import { parseLocalDate } from "@/shared/util/date";
 
 const taskStatusEnum = z.enum(["todo", "in-progress", "done"]);
 const taskPriorityEnum = z.enum(["low", "medium", "high"]);
@@ -111,7 +112,7 @@ export function TaskForm({ task, onSuccess }: TaskFormProps) {
         description: data.description || undefined,
         status: data.status,
         priority: data.priority,
-        dueDate: data.dueDate ? new Date(data.dueDate) : null,
+        dueDate: data.dueDate ? parseLocalDate(data.dueDate) : null,
       });
     } else {
       // Creation
@@ -120,7 +121,7 @@ export function TaskForm({ task, onSuccess }: TaskFormProps) {
         description: data.description || undefined,
         status: data.status,
         priority: data.priority,
-        dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
+        dueDate: data.dueDate ? parseLocalDate(data.dueDate) : undefined,
       });
     }
   }

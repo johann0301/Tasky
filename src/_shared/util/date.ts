@@ -46,3 +46,21 @@ export function isOverdue(date: Date | string | null, isCompleted: boolean): boo
   return isDatePast(date);
 }
 
+/**
+ * Converte uma string de data no formato "yyyy-MM-dd" para um objeto Date
+ * que representa meia-noite no timezone local, evitando problemas de conversão UTC.
+ * 
+ * Quando você faz new Date("2025-11-27"), o JavaScript interpreta como UTC meia-noite,
+ * e ao converter para timezone local (ex: UTC-3 no Brasil), vira o dia anterior.
+ * 
+ * Esta função garante que a data seja criada no timezone local.
+ * 
+ * @param dateString - String de data no formato "yyyy-MM-dd"
+ * @returns Date representando meia-noite no timezone local
+ */
+export function parseLocalDate(dateString: string): Date {
+  const [year, month, day] = dateString.split("-").map(Number);
+  // Cria a data no timezone local (não UTC)
+  return new Date(year, month - 1, day);
+}
+
