@@ -3,8 +3,8 @@
 import { trpc } from "@/lib/trpc";
 import { TaskKanbanCard } from "./TaskKanbanCard";
 import { useTaskStore } from "../store/taskStore";
-import { Loader2 } from "lucide-react";
 import { TaskStatus, type Task } from "../types";
+import { TaskListLoading, TaskListError, TaskListEmpty } from "@/shared/components/TaskListStates";
 import {
   DndContext,
   DragEndEvent,
@@ -14,11 +14,10 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  useDroppable,
-  useDraggable,
 } from "@dnd-kit/core";
 import { useState } from "react";
 import { toast } from "sonner";
+import { KanbanColumn } from "./KanbanColumn";
 
 const columns: { status: TaskStatus; title: string }[] = [
   { status: "todo", title: "A Fazer" },
@@ -62,11 +61,11 @@ export function TaskKanban() {
   });
 
   const handleDragStart = (event: DragStartEvent) => {
-    setActiveId(event.active.id as string);
+    setActiveId(String(event.active.id));
   };
 
   const handleDragOver = (event: DragOverEvent) => {
-    setOverId(event.over?.id as string | null);
+    setOverId(event.over ? String(event.over.id) : null);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -76,8 +75,8 @@ export function TaskKanban() {
 
     if (!over) return;
 
-    const taskId = active.id as string;
-    const newStatus = over.id as TaskStatus;
+    const taskId = String(active.id);
+    const newStatus = String(over.id) as TaskStatus;
 
     const task = tasks?.find((t) => t.id === taskId);
     if (!task) return;
@@ -95,37 +94,15 @@ export function TaskKanban() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <TaskListLoading />;
   }
 
   if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12 text-center">
-        <p className="text-lg font-semibold text-destructive">
-          Erro ao carregar tarefas
-        </p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {error.message || "Tente novamente mais tarde"}
-        </p>
-      </div>
-    );
+    return <TaskListError error={error} />;
   }
 
   if (!tasks || tasks.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12 text-center">
-        <p className="text-lg font-semibold">Nenhuma tarefa encontrada</p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {Object.keys(otherFilters).length > 0
-            ? "Tente ajustar os filtros ou criar uma nova tarefa"
-            : "Crie sua primeira tarefa para começar"}
-        </p>
-      </div>
-    );
+    return <TaskListEmpty hasFilters={Object.keys(otherFilters).length > 0} />;
   }
 
   // Group by status
@@ -156,92 +133,19 @@ export function TaskKanban() {
               key={column.status}
               status={column.status}
               title={column.title}
-              tasks={columnTasks as Task[]}
+              tasks={columnTasks}
               isOver={overId === column.status}
             />
           );
         })}
       </div>
       <DragOverlay>
-        {activeTask ? (
+        {activeTask && (
           <div className="opacity-50">
-            <TaskKanbanCard task={activeTask as Task} />
-          </div>
-        ) : null}
-      </DragOverlay>
-    </DndContext>
-  );
-}
-
-// Droppable column component
-function KanbanColumn({
-  status,
-  title,
-  tasks,
-  isOver,
-}: {
-  status: TaskStatus;
-  title: string;
-  tasks: Task[];
-  isOver: boolean;
-}) {
-  const { setNodeRef } = useDroppable({
-    id: status,
-  });
-
-  return (
-    <div className="flex flex-col">
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold">{title}</h2>
-        <p className="text-sm text-muted-foreground">
-          {tasks.length} {tasks.length === 1 ? "tarefa" : "tarefas"}
-        </p>
-      </div>
-      <div
-        ref={setNodeRef}
-        className={`flex-1 min-h-[200px] rounded-lg border-2 border-dashed p-4 transition-colors flex flex-col ${
-          isOver
-            ? "border-primary bg-primary/5"
-            : "border-muted bg-muted/50"
-        }`}
-      >
-        {tasks.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-8">
-            Nenhuma tarefa
-          </p>
-        ) : (
-          <div className="flex flex-col gap-4">
-            {tasks.map((task) => (
-              <DraggableTaskCard key={task.id} task={task} />
-            ))}
+            <TaskKanbanCard task={activeTask} />
           </div>
         )}
-      </div>
-    </div>
-  );
-}
-
-  // Draggable card component
-function DraggableTaskCard({ task }: { task: Task }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: task.id,
-  });
-
-  const style = transform
-    ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-      }
-    : undefined;
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...listeners}
-      {...attributes}
-      className={isDragging ? "opacity-50" : ""}
-    >
-      <TaskKanbanCard task={task} />
-    </div>
+      </DragOverlay>
+    </DndContext>
   );
 }

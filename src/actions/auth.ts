@@ -36,12 +36,10 @@ const updateProfileSchema = z.object({
   image: z.string().url("URL inválida").optional(),
 });
 
-// Registrar novo usuário
 export async function registerUser(data: z.infer<typeof registerSchema>) {
   try {
     const validatedData = registerSchema.parse(data);
 
-    // Verificar se email já existe
     const [existingUser] = await db
       .select()
       .from(users)
@@ -52,10 +50,8 @@ export async function registerUser(data: z.infer<typeof registerSchema>) {
       return { error: "Email já cadastrado" };
     }
 
-    // Hash da senha
     const hashedPassword = await bcrypt.hash(validatedData.password, 10);
 
-    // Criar usuário
     const [newUser] = await db
       .insert(users)
       .values({
@@ -74,45 +70,40 @@ export async function registerUser(data: z.infer<typeof registerSchema>) {
   }
 }
 
-// Solicitar reset de senha
 export async function requestPasswordReset(
   data: z.infer<typeof resetPasswordRequestSchema>
 ) {
   try {
     const { email } = resetPasswordRequestSchema.parse(data);
 
-    // Buscar usuário
     const [user] = await db
       .select()
       .from(users)
       .where(eq(users.email, email))
       .limit(1);
 
-    // Não revelar se o email existe ou não por segurança
+
     if (!user) {
       return { success: true };
     }
 
-    // Gerar token
     const resetToken = createId();
     const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 1); // Expira em 1 hora
+    expiresAt.setHours(expiresAt.getHours() + 1); 
 
-    // Salvar token no banco (usando verificationTokens do NextAuth)
     await db.insert(verificationTokens).values({
       identifier: email,
       token: resetToken,
       expires: expiresAt,
     });
 
-    // Enviar email (simulado ou via Resend)
+
     const baseUrl = process.env.AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const resetUrl = `${baseUrl}/auth/reset-password?token=${resetToken}`;
 
     if (resend) {
-      // Enviar email via Resend real
       try {
-        // Em modo DEV, usar onboarding@resend.dev (obrigatório para contas gratuitas)
+
         const fromEmail = 
           process.env.NODE_ENV === "development"
             ? "onboarding@resend.dev"
@@ -146,7 +137,6 @@ export async function requestPasswordReset(
 
         console.log("[Resend] Email enviado com sucesso:", result);
       } catch (error) {
-        // Logs detalhados do erro
         console.error("[Resend] Erro ao enviar email:");
         console.error("[Resend] Tipo do erro:", error instanceof Error ? error.constructor.name : typeof error);
         console.error("[Resend] Mensagem:", error instanceof Error ? error.message : String(error));
@@ -155,15 +145,12 @@ export async function requestPasswordReset(
           console.error("[Resend] Detalhes completos:", JSON.stringify(error, null, 2));
         }
         
-        // Verificar se é erro de domínio não verificado
         if (error instanceof Error && error.message.includes("domain")) {
           console.error("[Resend] ERRO: Domínio não verificado. Em DEV, use onboarding@resend.dev");
         }
         
-        // Continuar mesmo se falhar o envio (não revelar ao usuário)
       }
     } else {
-      // Simular envio (apenas em desenvolvimento)
       if (process.env.NODE_ENV === "development") {
         console.log("=".repeat(50));
         console.log("EMAIL DE RECUPERAÇÃO DE SENHA (SIMULADO):");
@@ -182,14 +169,12 @@ export async function requestPasswordReset(
   }
 }
 
-// Resetar senha com token
 export async function resetPassword(
   data: z.infer<typeof resetPasswordSchema>
 ) {
   try {
     const { token, password } = resetPasswordSchema.parse(data);
 
-    // Buscar token válido
     const [tokenRecord] = await db
       .select()
       .from(verificationTokens)
@@ -205,7 +190,6 @@ export async function resetPassword(
       return { error: "Token inválido ou expirado" };
     }
 
-    // Buscar usuário pelo email (identifier)
     const [user] = await db
       .select()
       .from(users)
@@ -216,16 +200,13 @@ export async function resetPassword(
       return { error: "Usuário não encontrado" };
     }
 
-    // Hash da nova senha
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Atualizar senha
     await db
       .update(users)
       .set({ password: hashedPassword, updatedAt: new Date() })
       .where(eq(users.id, user.id));
 
-    // Deletar token usado
     await db
       .delete(verificationTokens)
       .where(eq(verificationTokens.token, token));
@@ -239,7 +220,6 @@ export async function resetPassword(
   }
 }
 
-// Login via Server Action
 const loginSchema = z.object({
   email: z.string().email("Email inválido"),
   password: z.string().min(1, "Senha é obrigatória"),
@@ -272,7 +252,6 @@ export async function loginUser(credentials: {
   }
 }
 
-// Atualizar perfil do usuário
 export async function updateProfile(data: z.infer<typeof updateProfileSchema>) {
   try {
     const session = await auth();
@@ -283,7 +262,6 @@ export async function updateProfile(data: z.infer<typeof updateProfileSchema>) {
 
     const validatedData = updateProfileSchema.parse(data);
 
-    // Atualizar usuário no banco
     await db
       .update(users)
       .set({
@@ -293,7 +271,6 @@ export async function updateProfile(data: z.infer<typeof updateProfileSchema>) {
       })
       .where(eq(users.id, session.user.id));
 
-    // Revalidar página de perfil
     revalidatePath("/profile");
 
     return { success: true };

@@ -35,7 +35,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         try {
           const { email, password } = loginSchema.parse(credentials);
 
-          // Buscar usuário no banco
           const [user] = await db
             .select()
             .from(users)
@@ -45,8 +44,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           if (!user || !user.password) {
             throw new Error("Credenciais inválidas");
           }
-
-          // Verificar senha
+          
           const isValidPassword = await bcrypt.compare(password, user.password);
 
           if (!isValidPassword) {
