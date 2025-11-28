@@ -4,6 +4,7 @@ import { TaskList } from "./TaskList";
 import { TaskKanban } from "./TaskKanban";
 import { TaskFilters } from "./TaskFilters";
 import { TaskFormDialog } from "./TaskFormDialog";
+import { TaskDeleteDialog } from "./TaskDeleteDialog";
 import { Button } from "@/shared/components/button";
 import { Plus, LayoutGrid, List } from "lucide-react";
 import { useTaskStore } from "../store/taskStore";
@@ -52,6 +53,7 @@ export function TasksPageClient() {
       <TaskFilters />
       {viewMode === "list" ? <TaskList /> : <TaskKanban />}
       <TaskFormDialog />
+      <TaskDeleteDialog />
     </div>
   );
 }
